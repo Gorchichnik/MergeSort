@@ -13,8 +13,9 @@ public class Sort {
 		String outputFileName = null;
 		
 		for(int i = 0; i < args.length; i++) {
+			int length = args[i].length();
 			//parameters checking 
-			if(args[i].charAt(0) == '-' & args[i].length() == 2) {
+			if(args[i].charAt(0) == '-' & length == 2) {
 				switch(args[i].charAt(1)) {
 				case 'i':
 					isInt= true;
@@ -36,8 +37,11 @@ public class Sort {
 					break;
 				}
 			//file names adding
-			}else if(args[i].length() > 4){
-				String end = Character.toString(args[i].charAt( args[i].length() - 4)) + Character.toString(args[i].charAt( args[i].length() - 3)) + Character.toString(args[i].charAt( args[i].length() - 2)) + Character.toString(args[i].charAt( args[i].length() - 1));
+			}else if(length > 4){
+				String end = Character.toString(args[i].charAt( length - 4)) + 
+					     	 Character.toString(args[i].charAt( length - 3)) +
+					    	 Character.toString(args[i].charAt( length - 2)) + 
+					    	 Character.toString(args[i].charAt( length - 1));
 				if(end.equals(".txt") & outputFileName ==null) {
 					outputFileName = args[i];
 				}else if(end.equals(".txt")) {
