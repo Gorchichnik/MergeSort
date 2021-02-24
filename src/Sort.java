@@ -214,17 +214,20 @@ public class Sort {
 	public static <T> boolean compare(T data1, T data2, boolean isUp) {
 		try {
 			if(data1 instanceof String) {
-				if( ((String) data1).compareTo((String)data2) < 1 ) {
+				/*if( ((String) data1).compareTo((String)data2) < 1 ) {
 					return isUp;
 				}else {
 					return !isUp;
-				}
+				}*/
+				return ( ( (String)data1 ).compareTo( (String) data2 ) < 1) ? isUp : !isUp;  
 			}else {
+				/*
 				if((int) data1 < (int) data2 ) {
 					return isUp;
 				}else {
 					return !isUp;
-				}
+				}*/
+				return ( (int) data1 < (int) data2 ) ? isUp : !isUp;
 			}
 			
 		} catch (IndexOutOfBoundsException e) {
