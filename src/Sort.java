@@ -5,7 +5,7 @@ import java.io.*;
 public class Sort {
 
 	public static void main(String[] args) {
-		ArrayList<String> inputFileNames = new ArrayList<String>();
+		ArrayList<String> inputFilesNames = new ArrayList<String>();
 		//default values setting
 		boolean isInt = false;   
 		boolean isUp = true;    
@@ -42,30 +42,30 @@ public class Sort {
 					     	 Character.toString(args[i].charAt( length - 3)) +
 					    	 Character.toString(args[i].charAt( length - 2)) + 
 					    	 Character.toString(args[i].charAt( length - 1));
-				if(end.equals(".txt") & outputFileName ==null) {
+				if(end.equals(".txt") & outputFileName == null) {
 					outputFileName = args[i];
 				}else if(end.equals(".txt")) {
-					inputFileNames.add(args[i]);
+					inputFilesNames.add(args[i]);
 				}
 			}
 		}
-		if(inputFileNames.size() != 0) {
-			sortFiles(inputFileNames, outputFileName, isInt, isUp, isSorted);
+		if(inputFilesNames.size() != 0) {
+			sortFiles(inputFilesNames, outputFileName, isInt, isUp, isSorted);
 		}else {
 			System.out.println("There is no input or output files!");
 		}
 	}
 	
-	public static <T> void sortFiles(ArrayList<String> inputFileNames, String outputFileName, boolean isInt, boolean isUp, boolean isSorted) {
-		ArrayList<ArrayList<T>> arrListOfList;
+	public static <T> void sortFiles(ArrayList<String> inputFilesNames, String outputFileName, boolean isInt, boolean isUp, boolean isSorted) {
+		ArrayList<ArrayList<T>> filesData;
 		try {
-			arrListOfList = readingFiles(inputFileNames, isInt);
+			filesData = readingFiles(inputFilesNames, isInt);
 			//sorting of original files if they are not sorted
 			if(!isSorted) {
-				arrListOfList = sortOriginalFiles(arrListOfList, isInt, isUp);
+				filesData = sortOriginalFiles(filesData, isInt, isUp);
 			}
 			//sorting of files between themselves
-			ArrayList<T> finalList = sort(arrListOfList, isUp);
+			ArrayList<T> finalList = sort(filesData, isUp);
 			writeFile(finalList, outputFileName);
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -82,19 +82,19 @@ public class Sort {
 		System.out.println("File has been wrote!");
 	}
 	
-	public static <T> ArrayList<ArrayList<T>> sortOriginalFiles(ArrayList<ArrayList<T>> arrListOfList, boolean isInt, boolean isUp){
-		for(int i = 0; i < arrListOfList.size(); i++) {
-			arrListOfList.set(i, sortOriginal( arrListOfList.get(i), 0, arrListOfList.get(i).size()-1 , isUp));
+	public static <T> ArrayList<ArrayList<T>> sortOriginalFiles(ArrayList<ArrayList<T>> filesData, boolean isInt, boolean isUp){
+		for(int i = 0; i < filesData.size(); i++) {
+			filesData.set(i, sortOriginal( filesData.get(i), 0, filesData.get(i).size()-1 , isUp));
 		}
-		return arrListOfList;
+		return filesData;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> ArrayList<ArrayList<T>> readingFiles(ArrayList<String> inputFileNames, boolean isInt) throws FileNotFoundException {
+	public static <T> ArrayList<ArrayList<T>> readingFiles(ArrayList<String> inputFilesNames, boolean isInt) throws FileNotFoundException {
 		ArrayList<ArrayList<T>> result = new ArrayList<ArrayList<T>>();
 		
-		for(int i = 0; i < inputFileNames.size(); i++) {
-			    File file=new File(inputFileNames.get(i) );
+		for(int i = 0; i < inputFilesNames.size(); i++) {
+			    File file=new File(inputFilesNames.get(i) );
 				ArrayList<T> arrList = new ArrayList<T>();
 				Scanner sc = new Scanner(file);
 				
@@ -124,25 +124,25 @@ public class Sort {
 		return result;
 	}
 	
-	public static <T> ArrayList<T> sort( ArrayList<ArrayList<T>> arrListOfList, boolean isItUp) {
+	public static <T> ArrayList<T> sort( ArrayList<ArrayList<T>> filesData, boolean isItUp) {
 		ArrayList<T> returnedArrList;
 		
-		int nextInd = arrListOfList.size()/2;
+		int nextInd = filesData.size()/2;
 		if(nextInd > 0) {
 			ArrayList<ArrayList<T>> devidedArr = new ArrayList<ArrayList<T>>();
 			for(int i = 0; i < nextInd; i++) {
-				devidedArr.add(arrListOfList.get(i));
+				devidedArr.add(filesData.get(i));
 			}
 			ArrayList<T> firstArr = sort(devidedArr, isItUp);
 			devidedArr.clear();
-			for(int i = nextInd; i < arrListOfList.size(); i++) {
-				devidedArr.add(arrListOfList.get(i));
+			for(int i = nextInd; i < filesData.size(); i++) {
+				devidedArr.add(filesData.get(i));
 			}
 			ArrayList<T> secondArr = sort(devidedArr, isItUp);
 			
 			returnedArrList = sortTwoFiles(firstArr, secondArr, isItUp);
 		}else {
-			returnedArrList = arrListOfList.get(0);
+			returnedArrList = filesData.get(0);
 		}
 		return returnedArrList;
 	}
@@ -171,12 +171,6 @@ public class Sort {
 		return arr;
 	}
 	
-	public static <T> void viewArray(ArrayList<T> arr) {
-		System.out.println("Array is:");
-		for(T t : arr) {
-			System.out.println(t);
-		}
-	}
 
 	public static <T> ArrayList<T> sortOriginal( ArrayList<T> array, int leftInd, int rightInd, boolean isUp) {
 		int nextInd = leftInd + (rightInd - leftInd)/2 + 1;
