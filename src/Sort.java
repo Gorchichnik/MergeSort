@@ -7,50 +7,65 @@ public class Sort {
 	public static void main(String[] args) {
 		ArrayList<String> inputFileNames = new ArrayList<String>();
 		//default values setting
-		boolean isItInt = false;   
-		boolean isItUp = true;    
-		boolean isItSorted = true; 
+		boolean isInt = false;   
+		boolean isUp = true;    
+		boolean isSorted = true; 
+		String outputFileName = null;
 		
 		for(int i = 0; i < args.length; i++) {
 			//parameters checking 
 			if(args[i].charAt(0) == '-' & args[i].length() == 2) {
-				if(args[i].charAt(1) == 'i') {
-					isItInt= true;
-				}else if(args[i].charAt(1) == 'd') {
-					isItUp = false;
-				}else if(args[i].charAt(1) == 'n') {
-					isItSorted = false;
+				switch(args[i].charAt(1)) {
+				case 'i':
+					isInt= true;
+					break;
+				case 'd':
+					isUp = false;
+					break;
+				case 'n':
+					isSorted = false;
+					break;
+				case 's':
+					isInt = false;
+					break;
+				case 'a':
+					isUp = true;
+					break;
+				default:
+					System.out.println("Undefined parameter");
+					break;
 				}
 			//file names adding
 			}else if(args[i].length() > 4){
 				String end = Character.toString(args[i].charAt( args[i].length() - 4)) + Character.toString(args[i].charAt( args[i].length() - 3)) + Character.toString(args[i].charAt( args[i].length() - 2)) + Character.toString(args[i].charAt( args[i].length() - 1));
-				if(end.equals(".txt")) {
+				if(end.equals(".txt") & outputFileName ==null) {
+					outputFileName = args[i];
+				}else if(end.equals(".txt")) {
 					inputFileNames.add(args[i]);
 				}
 			}
 		}
 		if(inputFileNames.size() != 0) {
-			sortFiles(inputFileNames, isItInt, isItUp, isItSorted);
+			sortFiles(inputFileNames, outputFileName, isInt, isUp, isSorted);
 		}else {
 			System.out.println("There is no input or output files!");
 		}
 	}
 	
-	public static <T> void sortFiles(ArrayList<String> inputFileNames, boolean isItInt, boolean isItUp, boolean isItSorted) {
-			ArrayList<ArrayList<T>> arrListOfList;
-			try {
-				arrListOfList = readingFiles(inputFileNames, isItInt);
-				//sorting of original files if they are not sorted
-				if(!isItSorted) {
-					arrListOfList = sortOriginalFiles(arrListOfList, isItInt, isItUp);
-				}
-				String outputFileName = (String) inputFileNames.get(0);
-				//sorting of files between themselves
-				ArrayList<T> finalList = sort(arrListOfList, isItUp);
-				writeFile(finalList, outputFileName);
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
+	public static <T> void sortFiles(ArrayList<String> inputFileNames, String outputFileName, boolean isInt, boolean isUp, boolean isSorted) {
+		ArrayList<ArrayList<T>> arrListOfList;
+		try {
+			arrListOfList = readingFiles(inputFileNames, isInt);
+			//sorting of original files if they are not sorted
+			if(!isSorted) {
+				arrListOfList = sortOriginalFiles(arrListOfList, isInt, isUp);
 			}
+			//sorting of files between themselves
+			ArrayList<T> finalList = sort(arrListOfList, isUp);
+			writeFile(finalList, outputFileName);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	public static <T> void writeFile(ArrayList<T> finalList, String outputFileName) throws FileNotFoundException {
@@ -63,24 +78,24 @@ public class Sort {
 		System.out.println("File has been wrote!");
 	}
 	
-	public static <T> ArrayList<ArrayList<T>> sortOriginalFiles(ArrayList<ArrayList<T>> arrListOfList, boolean isItInt, boolean isItUp){
+	public static <T> ArrayList<ArrayList<T>> sortOriginalFiles(ArrayList<ArrayList<T>> arrListOfList, boolean isInt, boolean isUp){
 		for(int i = 0; i < arrListOfList.size(); i++) {
-			arrListOfList.set(i, sortOriginal( arrListOfList.get(i), 0, arrListOfList.get(i).size()-1 , isItUp));
+			arrListOfList.set(i, sortOriginal( arrListOfList.get(i), 0, arrListOfList.get(i).size()-1 , isUp));
 		}
 		return arrListOfList;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> ArrayList<ArrayList<T>> readingFiles(ArrayList<String> inputFileName, boolean isItInt) throws FileNotFoundException {
-		ArrayList<ArrayList<T>> returnedArrList = new ArrayList<ArrayList<T>>();
+	public static <T> ArrayList<ArrayList<T>> readingFiles(ArrayList<String> inputFileNames, boolean isInt) throws FileNotFoundException {
+		ArrayList<ArrayList<T>> result = new ArrayList<ArrayList<T>>();
 		
-		for(int i = 1; i < inputFileName.size(); i++) {
-			    File file=new File(inputFileName.get(i) );
+		for(int i = 0; i < inputFileNames.size(); i++) {
+			    File file=new File(inputFileNames.get(i) );
 				ArrayList<T> arrList = new ArrayList<T>();
 				Scanner sc = new Scanner(file);
 				
 				while(sc.hasNextLine()) {
-					if(isItInt) {
+					if(isInt) {
 						try {
 							arrList.add( (T) (Integer.valueOf(sc.nextLine())) );
 						} catch (NumberFormatException e) {
@@ -99,10 +114,10 @@ public class Sort {
 					}
 				}
 				sc.close();
-				returnedArrList.add(arrList);
+				result.add(arrList);
 		}
 		
-		return returnedArrList;
+		return result;
 	}
 	
 	public static <T> ArrayList<T> sort( ArrayList<ArrayList<T>> arrListOfList, boolean isItUp) {
@@ -128,7 +143,7 @@ public class Sort {
 		return returnedArrList;
 	}
 	
-	public static <T> ArrayList<T> sortTwoFiles(ArrayList<T> firstArr, ArrayList<T> secondArr, boolean isItUp) {
+	public static <T> ArrayList<T> sortTwoFiles(ArrayList<T> firstArr, ArrayList<T> secondArr, boolean isUp) {
 		int bufferLength = firstArr.size() + secondArr.size();
 		ArrayList<T> arr = new ArrayList<T>();
 		int firstInd = 0;
@@ -141,7 +156,7 @@ public class Sort {
 				arr.add(firstArr.get(firstInd));
 				firstInd++;
 				
-			}else if(compare(firstArr, secondArr, firstInd, secondInd, isItUp) ) {
+			}else if(compare(firstArr.get(firstInd), secondArr.get(secondInd), isUp) ) {
 				arr.add(firstArr.get(firstInd));
 				firstInd++;
 			}else {
@@ -159,12 +174,12 @@ public class Sort {
 		}
 	}
 
-	public static <T> ArrayList<T> sortOriginal( ArrayList<T> array, int leftInd, int rightInd, boolean isItUp) {
+	public static <T> ArrayList<T> sortOriginal( ArrayList<T> array, int leftInd, int rightInd, boolean isUp) {
 		int nextInd = leftInd + (rightInd - leftInd)/2 + 1;
 		
 		if(rightInd > leftInd + 1) {
-			array = sortOriginal(array, leftInd, nextInd -1, isItUp);
-			array = sortOriginal(array, nextInd, rightInd, isItUp);
+			array = sortOriginal(array, leftInd, nextInd -1, isUp);
+			array = sortOriginal(array, nextInd, rightInd, isUp);
 		}
 		ArrayList<T> buffer = new ArrayList<T>();
 		int cursor = leftInd;
@@ -172,7 +187,7 @@ public class Sort {
 		
 		try {
 			for(int i = 0; i <= rightInd - leftInd; i++) {
-				if(cursor < middle & (nextInd > rightInd || compare(array, array, cursor, nextInd, isItUp) ) ) {
+				if(cursor < middle & (nextInd > rightInd || compare(array.get(cursor), array.get(nextInd), isUp) ) ) {
 					buffer.add( array.get(cursor));
 					cursor++;
 				}else {
@@ -198,38 +213,23 @@ public class Sort {
 		return array;
 	}
 	
-	public static <T> boolean compare(ArrayList<T> string1, ArrayList<T> string2, int firstInd, int secondInd, boolean isItUp) {
+	public static <T> boolean compare(T data1, T data2, boolean isUp) {
 		try {
-			if(string1.get(0) instanceof String) {
-				int i = 0;
-				String str1 = (String) string1.get(firstInd);
-				String str2 = (String) string2.get(secondInd);
-				int length1 = str1.length();
-				int length2 = str2.length();
-			
-				do {
-					if( str1.charAt(i) < str2.charAt(i) ) {
-						return isItUp;
-					}else if(str1.charAt(i) > str2.charAt(i)) {
-						return !isItUp;
-					}else {
-						i++;
-					}
-				}while(i < length1 & i < length2);
-				if(length1 < length2) {
-					return isItUp;
+			if(data1 instanceof String) {
+				if( ((String) data1).compareTo((String)data2) < 1 ) {
+					return isUp;
 				}else {
-					return !isItUp;
+					return !isUp;
 				}
 			}else {
-				if((int) string1.get(firstInd) < (int) string2.get(secondInd)) {
-					return isItUp;
+				if((int) data1 < (int) data2 ) {
+					return isUp;
 				}else {
-					return !isItUp;
+					return !isUp;
 				}
 			}
+			
 		} catch (IndexOutOfBoundsException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
